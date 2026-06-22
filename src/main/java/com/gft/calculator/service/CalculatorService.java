@@ -3,6 +3,7 @@ package com.gft.calculator.service;
 import com.gft.calculator.domain.Operation;
 import com.gft.calculator.dto.CalculationRequest;
 import com.gft.calculator.dto.CalculationResponse;
+import com.gft.calculator.exception.UnsupportedCalculatorOperationException;
 import com.gft.calculator.service.operation.OperationHandler;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class CalculatorService {
         OperationHandler operationHandler = operationHandlers.get(request.operation());
 
         if (operationHandler == null) {
-            throw new IllegalArgumentException("Unsupported operation: " + request.operation());
+            throw new UnsupportedCalculatorOperationException(request.operation());
         }
 
         BigDecimal result = operationHandler.calculate(request.leftOperand(), request.rightOperand());

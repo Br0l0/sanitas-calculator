@@ -73,7 +73,10 @@ class CalculatorControllerTest {
         mockMvc.perform(post("/api/calculator/calculate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
+                .andExpect(jsonPath("$.message").value("The request contains invalid fields"))
+                .andExpect(jsonPath("$.details[0]").value("operation: must not be null"));
     }
 
     @Test
@@ -88,6 +91,46 @@ class CalculatorControllerTest {
         mockMvc.perform(post("/api/calculator/calculate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"))
+                .andExpect(jsonPath("$.message").value("The request contains invalid fields"))
+                .andExpect(jsonPath("$.details[0]").value("rightOperand: must not be null"));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenOperationIsInvalid() throws Exception {
+        String request = """
+                {
+                  "operation": "MULTIPLY",
+                  "leftOperand": 2,
+                  "rightOperand": 3
+                }
+                """;
+
+        mockMvc.perform(post("/api/calculator/calculate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_REQUEST_BODY"))
+                .andExpect(jsonPath("$.message").value("The request body is invalid or malformed"))
+                .andExpect(jsonPath("$.details[0]").value("Check the JSON format and supported operation values: ADD, SUBTRACT"));
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenJsonIsMalformed() throws Exception {
+        String request = """
+                {
+                  "operation": "ADD",
+                  "leftOperand": 2,
+                  "rightOperand":
+                }
+                """;
+
+        mockMvc.perform(post("/api/calculator/calculate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_REQUEST_BODY"))
+                .andExpect(jsonPath("$.message").value("The request body is invalid or malformed"));
     }
 }

@@ -97,6 +97,34 @@ curl -X POST http://localhost:8080/api/calculator/calculate \
   -d '{"operation":"SUBTRACT","leftOperand":7,"rightOperand":4}'
 ```
 
+## Error responses
+
+Invalid requests return `400 Bad Request` with a structured error body.
+
+Example:
+
+```json
+{
+  "code": "INVALID_REQUEST",
+  "message": "The request contains invalid fields",
+  "details": [
+    "operation: must not be null"
+  ]
+}
+```
+
+Unsupported operation values or malformed JSON return:
+
+```json
+{
+  "code": "INVALID_REQUEST_BODY",
+  "message": "The request body is invalid or malformed",
+  "details": [
+    "Check the JSON format and supported operation values: ADD, SUBTRACT"
+  ]
+}
+```
+
 ## Tests
 
 Run:
